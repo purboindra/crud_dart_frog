@@ -12,24 +12,25 @@ FutureOr<Response> onRequest(RequestContext context, String id) async {
   if (context.request.method == HttpMethod.get) {
     return _get(context, signUp);
   } else if (context.request.method == HttpMethod.delete) {
-    return _deleteUser(context, id);
+    return _deleteUser(context, id, signUp);
   } else if (context.request.method == HttpMethod.put) {
     return _updateUser(context, signUp, id);
   } else {
     return Response(
+      statusCode: HttpStatus.methodNotAllowed,
       body: 'Something went wront',
     );
   }
 }
 
-// FOR GET ALL USER
-
+// FOR GET USER BY ID
 Future<Response> _get(RequestContext context, SignUpModel signUpModel) async {
-  return Response.json(body: signUpModel);
+  return Response.json(
+    body: signUpModel,
+  );
 }
 
 // FOR UPDATE USER BY ID
-
 Future<Response> _updateUser(
   RequestContext context,
   SignUpModel signUpModel,
@@ -50,9 +51,15 @@ Future<Response> _updateUser(
 }
 
 // FOR DELETE USER
-
-Future<Response> _deleteUser(RequestContext context, String id) async {
+Future<Response> _deleteUser(
+  RequestContext context,
+  String id,
+  SignUpModel signUpModel,
+) async {
   final data = context.read<SignUpDataSource>();
   await data.deleteUser(id);
-  return Response(statusCode: HttpStatus.noContent);
+  return Response(
+    statusCode: HttpStatus.noContent,
+    body: 'User ${signUpModel.userName} success delete!',
+  );
 }
